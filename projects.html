@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pojects</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+                <li><a href="index.html">Home</a></li>
+
+    <main class="contents"
+<section id="projects" class="projects-section">
+            <h2>Projects</h2>
+            <div class="project-cards-container">
+                <div class="project-card">
+                    <h3>Random Writer</h3>
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;ctime&gt;
+#include &lt;cstdlib&gt;
+#include "list.h"
+
+using namespace std;
+
+string new_seed(list &amp;char_list, int k) {
+    // ... (rest of your C++ code snippet)
+}
+                    </code></pre>
+                    <p>GitHub</p>
+                    <a href="#" class="project-link" aria-label="View Project Details">+</a>
+                </div>
+                <div class="project-card">
+                    <h3>Political Discussion on Twitter</h3>
+                    <p>About the Project</p>
+                    <p>Analysis</p>
+                    <p>Home</p>
+                    <h4>Overall Summary Data</h4>
+                    <p>East Summerton Data for Governor</p>
+                    <p>Site</p>
+                     <a href="#" class="project-link" aria-label="View Project Details">+</a>
+                </div>
+                <div class="project-card">
+                     <h3>Flappy Bird</h3>
+                    <pre><code class="language-python">class Bird(pygame.sprite.Sprite):
+    images = [pygame.image.load('bluebird-upflap.png'),
+              pygame.image.load('bluebird-midflap.png'),
+              pygame.image.load('bluebird-downflap.png')]
+
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.rot = 0
+        self.vel = 0
+        self.birdIndex = 0
+        self.image = self.images[self.birdIndex]
+        self.rect = self.image.get_rect(center=(100, int(SCREENHEIGHT/2)))
+        self.flapCycle = 0
+        self.dropped = False
+        self.rotCycle = 0
+        self.rot = 0
+        self.score = 0
+
+    def update(self):
+        self.vel += GRAVITY
+        self.rect.centery += self.vel
+        if self.rect.bottom > SCREENHEIGHT:
+            self.rect.bottom = SCREENHEIGHT
+            self.dropped = True
+        if self.flapCycle == 5:
+            self.birdIndex += 1
+            if self.birdIndex == 3:
+                self.birdIndex = 0
+            self.flapCycle = 0
+        self.image = pygame.transform.rotate(self.images[self.birdIndex], self.rot)
+        self.flapCycle += 1
+
+        if not self.dropped:
+            if self.vel < 0:
+                self.rot = 45
+            elif self.vel > 0 and self.rot > -90:
+                self.rot -= 5
+        else:
+            if self.rot > -90:
+                self.rot -= 5
+
+    def flap(self):
+        if not self.dropped:
+            self.vel = FLAPVELOCITY
+            self.flapCycle = 0
+            self.birdIndex = 0
+
+    def score(self):
+        self.score += 1
+
+
+class Pipe(pygame.sprite.Sprite):
+    def __init__(self, x, y, position):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('pipe.png')
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.passed = False
+
+    def update(self):
+        self.rect.left -= SPEED
+
+    def pass_bird(self, bird):
+        if self.rect.right < bird.rect.left and not self.passed:
+            self.passed = True
+            return True
+        return False
+
+
+class Scoreboard(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.score = 0
+        self.font = pygame.font.SysFont('Comic Sans MS', 30)
+        self.image = self.font.render(str(self.score), False, (0, 0, 0))
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+    def update(self, score):
+        self.score = score
+        self.image = self.font.render(str(self.score), False, (0, 0, 0))
+        self.rect = self.image.get_rect(topleft=self.rect.topleft)
+
+
+def main():
+    pygame.init()
+    screen = pygame.display.set_mode((SCREENWIDTH, SCREENHEIGHT))
+    pygame.display.set_caption('Flappy Bird')
+    background = pygame.image.load('background.png')
+    bird = Bird()
+    pipes = pygame.sprite.Group()
+    scoreboard = Scoreboard(10, 10)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    bird.flap()
+
+        pipes.update()
+        bird.update()
+
+        if len(pipes) == 0 or pipes.sprites()[-1].rect.right < SCREENWIDTH - PIPE_SPACING:
+            pipe_pos = random.randint(PIPE_GAP_MIN, PIPE_GAP_MAX)
+            pipes.add(Pipe(SCREENWIDTH, 0, 'top'))
+            pipes.add(Pipe(SCREENWIDTH, SCREENHEIGHT - pipe_pos, 'bottom'))
+
+        for pipe in pipes:
+            if pipe.rect.right < 0:
+                pipes.remove(pipe)
+            if pipe.pass_bird(bird):
+                bird.score()
+
+        scoreboard.update(bird.score)
+
+        screen.blit(background, (0, 0))
+        pipes.draw(screen)
+        screen.blit(bird.image, bird.rect)
+        screen.blit(scoreboard.image, scoreboard.rect)
+
+        if pygame.sprite.spritecollideany(bird, pipes) or bird.rect.bottom == SCREENHEIGHT:
+            print("Game Over! Score:", bird.score)
+            pygame.quit()
+            sys.exit()
+
+        pygame.display.update()
+
+
+if __name__ == '__main__':
+    main()
+                    </code></pre>
+                    <p>GitHub</p>
+                    <a href="#" class="project-link" aria-label="View Project Details">+</a>
+                </div>
+                </div>
+        </section>
+
+        <section id="contact" class="contact-section">
+            <h2>Contact</h2>
+            <p>Email: peterkibara1155@gmail.com</p>
+            </section>
+        </main>
+           
+    </body>
+ </html>
